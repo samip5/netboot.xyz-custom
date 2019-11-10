@@ -37,7 +37,7 @@ chain https://raw.githubusercontent.com/${github_user}/netboot.xyz-custom/master
 set github_url https://github.com/netbootxyz/debian-core-10/releases/download/4.19.67-2-04fe0fb9/
 set remote_url https://files.samip.fi/pxe-boot/Tails/v4.0/live/
 kernel ${remote_url}vmlinuz boot=live fetch=${remote_url}filesystem.squashfs initrd=initrd nopersistence noprompt timezone=Europe/Helsinki block.events_dfl_poll_msecs=1000 splash noautologin module=Tails slab_nomerge slub_debug=FZP mce=0 vsyscall=none page_poison=1 mds=full,nosmt
-initrd ${remote_url}initrd
+initrd ${remote_url}initrd.img
 
 :custom_exit
 chain utils.ipxe
