@@ -9,6 +9,7 @@ goto ${menu} ||
 menu Utilities - Image Sig Checks: [${img_sigs_enabled}]
 item --gap Utilities:
 item ubcd ${space} Ultimate Boot CD (UBCD)
+item dban ${space} Darik's Boot and Nuke (DBAN)
 item --gap netboot.xyz tools:
 item nbxyz-custom ${space} Set Github User [user: ${github_user}]
 item testdistro ${space} Test Distribution ISO
@@ -22,6 +23,11 @@ goto utils_exit
 :ubcd
 set util_path 185.218.193.132/ubcd538.iso
 set util_file ubcd538.iso
+goto boot_memdisk
+
+:dban
+set util_path 185.218.193.132/dban-2.3.0_i586.iso
+set util_file dban-2.3.0_i586.iso
 goto boot_memdisk
 
 :boot_memdisk
