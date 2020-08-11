@@ -31,7 +31,7 @@ chain ${menu}.ipxe || goto utils_exit
 goto utils_exit
 
 :ubcd
-set util_path files.samip.fi/pxe-boot/ubcd538.iso
+set util_path http://185.218.193.132/ubcd538.iso
 set util_file ubcd538.iso
 goto boot_memdisk
 
