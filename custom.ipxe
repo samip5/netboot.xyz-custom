@@ -8,17 +8,6 @@ goto ${menu} ||
 
 menu Utilities - Image Sig Checks: [${img_sigs_enabled}]
 item --gap Utilities:
-item avg ${space} AVG Rescue CD
-item clonezilla ${space} Clonezilla
-item dban ${space} DBAN
-item gparted ${space} GParted
-item grml ${space} Grml
-item hdt ${space} Hardware Detection Tool
-item memtest-420 ${space} Memtest86+ 4.20
-item memtest-501 ${space} Memtest86+ 5.01
-item partition-wizard ${space} Partition Wizard
-item pogostick ${space} Pogostick - Offline Windows Password and Registry Editor
-item supergrub ${space} Super Grub2 Disk
 item ubcd ${space} Ultimate Boot CD (UBCD)
 item --gap netboot.xyz tools:
 item nbxyz-custom ${space} Set Github User [user: ${github_user}]
