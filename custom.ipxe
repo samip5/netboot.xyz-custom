@@ -1,86 +1,60 @@
 #!ipxe
 
-# CentOS Operating System
-# http://www.centos.org
-
 isset ${dhcp-server} && set ipparam ip=dhcp || set ipparam ip=${ip}::${gateway}:${netmask}:::none nameserver=${dns}
 set ipparam BOOTIF=${netX/mac} ${ipparam}
 
 goto ${menu} ||
 
-:centos
-clear osversion
-set os CentOS
-menu ${os} - ${arch}
-item 8.1.1911 ${space} ${os} 8.1
-item 8.0.1905 ${space} ${os} 8.0
-item 8-stream ${space} ${os} 8.0 Stream
-item 7 ${space} ${os} 7
-isset ${osversion} || choose osversion || goto linux_menu
+
+menu Utilities - Image Sig Checks: [${img_sigs_enabled}]
+item --gap Utilities:
+item avg ${space} AVG Rescue CD
+item clonezilla ${space} Clonezilla
+item dban ${space} DBAN
+item gparted ${space} GParted
+item grml ${space} Grml
+item hdt ${space} Hardware Detection Tool
+item memtest-420 ${space} Memtest86+ 4.20
+item memtest-501 ${space} Memtest86+ 5.01
+item partition-wizard ${space} Partition Wizard
+item pogostick ${space} Pogostick - Offline Windows Password and Registry Editor
+item supergrub ${space} Super Grub2 Disk
+item ubcd ${space} Ultimate Boot CD (UBCD)
+item --gap netboot.xyz tools:
+item nbxyz-custom ${space} Set Github User [user: ${github_user}]
+item testdistro ${space} Test Distribution ISO
+item testpr ${space} Test netboot.xyz branch
+choose --default ${menu} menu || goto utils_exit
 echo ${cls}
-set dir ${centos_base_dir}/${osversion}/BaseOS/${arch}/os
-iseq ${osversion} 7 && set dir ${centos_base_dir}/${osversion}/os/${arch} ||
-set repo ${centos_mirror}/${dir}
-goto boottype
+goto ${menu} ||
+chain ${menu}.ipxe || goto utils_exit
+goto utils_exit
 
-:boottype
-set ova ${os} ${osversion}
-menu ${os} ${arch} boot type
-item graphical ${ova} graphical installer
-item text ${ova} text based installer
-item rescue ${ova} rescue
-item kickstart ${ova} set kickstart url [ ${ksurl} ]
-item kickstart_device ${ova} set ksdevice [ ${ksdevice} ]
-isset ${bt} || choose bt || goto centos
-echo ${cls}
-iseq ${bt} text && goto text ||
-iseq ${bt} rescue && goto rescue ||
-iseq ${bt} kickstart && goto kickstart ||
-iseq ${bt} kickstart_device && goto kickstart_device ||
-goto bootos_images
+:ubcd
+set util_path files.samip.fi/pxe-boot/ubcd538.iso
+set util_file ubcd538.iso
+goto boot_memdisk
 
-:text
-set params text ||
-goto bootos_images
-
-:rescue
-set params rescue ||
-goto bootos_images
-
-:kickstart
-echo -n Specify kickstart URL for ${os} ${osversion}: && read ksurl
-set params inst.ks=${ksurl} ||
-clear bt
-goto boottype
-
-:kickstart_device
-echo -n Specify ksdevice param for ${os} ${osversion}: && read ksdevice
-set ksdevice ${ksdevice} ||
-clear bt
-goto boottype
-
-:bootos_images
+:boot_memdisk
 imgfree
-kernel ${centos_mirror}/${dir}/images/pxeboot/vmlinuz repo=${repo} ${params} ${console} ${ipparam} initrd=initrd.img
-initrd ${centos_mirror}/${dir}/images/pxeboot/initrd.img
+kernel ${memdisk} iso raw
+initrd http://${util_path}
 echo
 echo MD5sums:
-md5sum vmlinuz initrd.img
+md5sum memdisk ${util_file}
+iseq ${img_sigs_enabled} true && goto verify_sigs || goto skip_sigs
+:verify_sigs
+echo
+echo Checking signatures...
+imgverify memdisk ${sigs}memdisk.sig || goto error
+imgverify ${util_file} ${sigs}${menu}/${util_file}.sig || goto error
+echo Signatures verified!
+echo
+:skip_sigs
 boot
-goto linux_menu
+goto utils_exit
 
-:linux_menu
+
+:utils_exit
 clear menu
 exit 0
-
-
-:option_tails
-set github_url https://github.com/netbootxyz/debian-core-10/releases/download/4.19.67-2-04fe0fb9/
-set remote_url https://files.samip.fi/pxe-boot/Tails/v4.0/live/
-kernel ${github_url}vmlinuz boot=live fetch=${remote_url}filesystem.squashfs initrd=initrd nopersistence noprompt timezone=Europe/Helsinki block.events_dfl_poll_msecs=1000 splash noautologin module=Tails slab_nomerge slub_debug=FZP mce=0 vsyscall=none page_poison=1 mds=full,nosmt
-initrd ${github_url}initrd
-boot || goto custom_exit
-
-:custom_exit
-chain utils.ipxe
-exit
